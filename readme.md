@@ -5,13 +5,8 @@
 
 Python wrapper for attitude dynamics of VSCMG in pyramid cluster.
 
-For Reinforcement Learning, It is important to have precise envirnmet responsive to actions.
-Matlab based ODE integrator are easy to implement but slower in performance. Slight improvement 
-in performace with python odeint integrators, since order of magnitude of steps to be performed
-by a learning agent are in billions. To improve computation speed C++ based dynamical envirnomet is needed
-
-This dynamical stepper implemented in C++ has shown signigicaltly large improvements in speed without compramising
-solution accuracy. To simplify access to envirnoment, python wrapper is implemented to expose VSCMG_ENV stepper.
+For Reinforcement Learning, It is important to have precise envirnmet responsive to actions. Matlab based ODE integrator are easy to implement but slower in performance. Slight improvement  in performace with python odeint integrators, since order of magnitude of steps to be performed by a learning agent are in billions. To improve computation speed C++ based dynamical envirnomet is needed
+This dynamical stepper implemented in C++ has shown signigicaltly large improvements in speed without compramising solution accuracy. To simplify access to envirnoment, python wrapper is implemented to expose VSCMG_ENV stepper.
 
 ## Python Usage
 Import exposed python class with
@@ -48,16 +43,18 @@ print(state)
 
 ## Visual Studio C++ Project Properties
 ```c
-	C/C++ > Additional Include Directories
-		%PYTHON_ROOT%\include;
-		%BOOST_ROOT%;
-		%ARMADILLO_ROOT%\include;
+C/C++ >> Additional Include Directories
+	%PYTHON_ROOT%\include;
+	%BOOST_ROOT%;
+	%ARMADILLO_ROOT%\include;
 
-	Linker > Additional Library Directories
-		%PYTHON_ROOT%\libs;
-		%BOOST_ROOT%\stage\lib;
-		%ARMADILLO_ROOT%\lib_win64;
+Linker >> Additional Library Directories
+	%PYTHON_ROOT%\libs;
+	%BOOST_ROOT%\stage\lib;
+	%ARMADILLO_ROOT%\lib_win64;
 ```
+
+
 ## TODO
 CMake Support
 
