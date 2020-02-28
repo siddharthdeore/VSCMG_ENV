@@ -31,8 +31,14 @@ print(state)
 
 ```
 
+## Compile Requrements
+	Visual Studio C++ 2019 (MSVC 14.23)
+	Python 3.7
+	Boost 1.72.0
+	Armadillo 9.850.1
 
-## Project Properties
+
+## Visual Studio C++ Project Properties
 ```c
 	C/C++ > Additional Include Directories
 		%PYTHON_ROOT%\include;
@@ -44,3 +50,12 @@ print(state)
 		%BOOST_ROOT%\stage\lib;
 		%ARMADILLO_ROOT%\lib_win64;
 ```
+## TODO
+CMake Support
+
+## Contributing
+Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
+
+---
+## License
+[MIT](https://choosealicense.com/licenses/mit/)
