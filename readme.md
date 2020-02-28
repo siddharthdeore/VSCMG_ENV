@@ -24,11 +24,31 @@ sat.setState(IC)
 # control action array of (4 x RW acerlations, 4 x gimbal rates)
 action=np.array([0.0,0.0,0.0,0.0, 0.0,0.0,0.0,0.0])
 t = 0	# time
-dt = 0	# step size
+dt = 0.01	# step size
 
 # take dynamical step of size dt with control action as input
-
 states=sat.step(action,t,dt)
+
+# step without control action
+states=sat.stepNull(t,dt) 
+
+# step without control action
+states=sat.stepNull(t,dt) 
+
+# Reset to default Orientation and zero kinetic energy
+sat.resetState()
+
+# Show Satellite Information
+sat.Info()
+
+# Body Inertia
+I=np.array([[1., 0., 0.], [0., 1., 0.], [0., 0., 1.]])
+Jg=0.01 # Gimbal Inertia
+Jw=0.01 # Reaction Wheel Inertia
+
+# Set body, Gimbal and Reaction wheel Inertia
+sat.setInertia(I,Jg, Jw)
+sat.Info()
 
 print(states)
 

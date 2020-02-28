@@ -82,10 +82,10 @@ void VSCMG::normalizeQuaternions(double& _q0, double& _q1, double& _q2, double& 
 	_q2 /= norm;
 	_q3 /= norm;
 }
-void VSCMG::setInertia(arma::mat Jb, double  Jg, double Jt) {
+void VSCMG::setInertia(arma::mat Jb, double  Jg, double Jw) {
 	this->_Jb = Jb;
 	this->_Jg = Jg;
-	this->_Jt = Jt;
+	this->_Jw = Jw;
 }
 /*
 void VSCMG::controlAction(double u0, double u1, double u2, double u3, double u4, double u5, double u6, double u7) {
@@ -96,6 +96,20 @@ void VSCMG::controlAction(double u0, double u1, double u2, double u3, double u4,
 void VSCMG::controlAction(std::vector<double> v) {
 	Omega_dot = { v[0],v[1],v[2],v[3] };
 	Delta_dot = { v[4],v[5],v[6],v[7] };
+}
+
+void VSCMG::Info()
+{
+	printf("\n Variable Speed Control Moment Gyro Pyramid Cluster \n");
+	printf("Body Inertia : \n");
+	for (short i = 0; i < 3; i++) {
+		for (short j = 0; j < 3; j++) {
+			printf("%8.4f ",this->_Jb(i,j));
+		}
+		printf("\n");
+	}
+	printf("\n Reaction Inertia : %8.4f \t Gimbal Inertia %8.4f \n", this->_Jw, this->_Jg);
+
 }
 
 

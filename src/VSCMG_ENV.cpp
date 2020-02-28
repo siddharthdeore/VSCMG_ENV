@@ -24,21 +24,20 @@ struct Satellite {
 		}
 
 	}
-	void setInertia(boost::python::numpy::ndarray& input, double Jg, double Jt) {
+	void setInertia(boost::python::numpy::ndarray& input, double Jg, double Jw) {
 		NumPyArrayData<double> data(input);
 		arma::mat Jb = {
 			{ 0.0220, 0.0012, -0.0070 },
 			{ 0.0012, 0.0220,  0.0012 },
 			{-0.0070, 0.0012,  0.0029 },
 		};
+
 		for (short i = 0; i < 3; i++) {
 			for (short j = 0; j < 3; j++) {
 				Jb(i, j) = data(i, j);
-				printf("%8.4f ", Jb(i, j));
 			}
-			printf("\n");
 		}
-		satellite.setInertia(Jb, Jg, Jt);
+		satellite.setInertia(Jb, Jg, Jw);
 	}
 	//(Exposed to python) set state of satellite from numpy array 
 	void resetState() {
@@ -74,7 +73,9 @@ struct Satellite {
 		std::copy(this->X.begin(), this->X.end(), reinterpret_cast<double*>(result.get_data()));
 		return result;
 	}
-
+	void Info() {
+		satellite.Info();
+	}
 };
 
 // Expose VSCMG_ENV Class to Python
@@ -88,6 +89,7 @@ BOOST_PYTHON_MODULE(VSCMG_ENV) {
 		.def("setState", &Satellite::setState)
 		.def("resetState", &Satellite::resetState)
 		.def("setInertia", &Satellite::setInertia)
+		.def("Info", &Satellite::Info)
 		
 		;
 

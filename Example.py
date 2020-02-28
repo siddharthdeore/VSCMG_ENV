@@ -7,9 +7,22 @@ import VSCMG_ENV
 # create VSCMG satellite object
 sat=VSCMG_ENV.Satellite()
 
+# Show Satellite Information
+sat.Info()
+
+# Change Satellite Inertia
+I=np.array([[1., 0., 0.], [0., 1., 0.], [0., 0., 1.]])
+Jg=0.01 # Gimbal Inertia
+Jw=0.01 # Reaction Wheel Inertia
+sat.setInertia(I,Jg, Jw)
+sat.Info()
+
 # set satellite states with array of(quaternion, body rates, RW velocities, gimbal angles)
 IC=np.array([1.0, 0.0, 0.0, 0.0,	0.0, 0.0, 0.0,	1000.0, 1000.0, 1000.0, 1000.0,  0.0, 0.0, 0.0, 0.0])
 sat.setState(IC)
+
+# Show Satellite Information
+sat.Info()
 
 # control action array of (4 x RW acerlations, 4 x gimbal rates)
 action=np.array([0.0,0.0,0.0,0.0, 0.01,0.01,0.01,0.01])
