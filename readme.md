@@ -28,9 +28,9 @@ dt = 0	# step size
 
 # take dynamical step of size dt with control action as input
 
-states=sat.action(action,t,dt)
+states=sat.step(action,t,dt)
 
-print(state)
+print(states)
 
 ```
 
