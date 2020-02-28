@@ -154,17 +154,18 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="VSCMG.cpp" />
-    <ClCompile Include="VSCMG_ENV.cpp" />
-  </ItemGroup>
-  <ItemGroup>
     <Text Include="readme.md" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="VSCMG.h" />
+    <None Include="Example.py" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Example.py" />
+    <ClCompile Include="src\VSCMG.cpp" />
+    <ClCompile Include="src\VSCMG_ENV.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\VSCMG.h" />
+    <ClInclude Include="src\VSCMG_ENV.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
