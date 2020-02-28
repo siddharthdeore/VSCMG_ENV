@@ -5,19 +5,29 @@ Import exposed python class with
 import numpy as np
 import VSCMG_ENV
 
+# create VSCMG satellite object
 sat=VSCMG_ENV.Satellite()
-action=np.array([0.0,0.0,0.0,0.0, 0.0,0.0,0.0,0.0])
 
-sat=VSCMG_ENV.Satellite()
-IC=np.array([1.0, 0.0, 0.0, 0.0, 0.0 ,0.0, 0.0, 1000.0, 1000.0, 1000.0, 1000.0,  0.0, 0.0, 0.0, 0.0])
+# set satellite states with array of(quaternion, body rates, RW velocities, gimbal angles)
+IC=np.array([1.0, 0.0, 0.0, 0.0,	0.0, 0.0, 0.0,	1000.0, 1000.0, 1000.0, 1000.0,  0.0, 0.0, 0.0, 0.0])
 sat.setState(IC)
 
+# control action array of (4 x RW acerlations, 4 x gimbal rates)
+action=np.array([0.0,0.0,0.0,0.0, 0.0,0.0,0.0,0.0])
+t = 0	# time
+dt = 0	# step size
+
+# take dynamical step of size dt with control action as input
+
+states=sat.action(action,t,dt)
+
+print(state)
 
 ```
 
 
 ## Project Properties
-```C++
+```c
 	C/C++ > Additional Include Directories
 		%PYTHON_ROOT%\include;
 		%BOOST_ROOT%;
