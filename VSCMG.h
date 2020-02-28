@@ -1,3 +1,8 @@
+/*
+	@author :	Siddharth Deore
+	@email	:	deore.1823670@studenti.uniroma1.it
+*/
+
 #pragma once
 
 #include <boost/python.hpp>

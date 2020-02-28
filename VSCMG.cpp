@@ -1,3 +1,7 @@
+/*	
+	@author :	Siddharth Deore
+	@email	:	deore.1823670@studenti.uniroma1.it
+*/
 #define _CRT_SECURE_NO_WARNINGS
 
 #include "VSCMG.h"

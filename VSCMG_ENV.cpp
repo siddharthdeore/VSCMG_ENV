@@ -1,3 +1,8 @@
+/*
+	@author :	Siddharth Deore
+	@email	:	deore.1823670@studenti.uniroma1.it
+*/
+
 #define _CRT_SECURE_NO_WARNINGS
 #include "VSCMG.h"
 
@@ -5,9 +10,12 @@ namespace bn = boost::python::numpy;
 
 struct Satellite {
 	state_type X= { 0.0,0.0,0.0,1.0,   0.0,0.0,0.0, 100.0,100.0,100.0,100.0, 0.0,0.0,0.0,0.0, };
+	// initialise object
 	VSCMG satellite;
+	// initialise stepper
 	boost::numeric::odeint::runge_kutta_cash_karp54< state_type > stepper;
 
+	//(Exposed to python) set state of satellite from numpy array 
 	void setState(boost::python::numpy::ndarray& input) {
 		double* input_ptr = reinterpret_cast<double*>(input.get_data());
 		//std::vector<double> v(input_size);
@@ -16,7 +24,8 @@ struct Satellite {
 		}
 
 	}
-	// Exposed Step Function Take a step and return Numpy Array
+	// (Exposed to python) Take a dybamical step step and return Numpy Array
+	// x = f(x,u,t)
 	bn::ndarray step(boost::python::numpy::ndarray& input, double t, double dt) {
 		double* input_ptr = reinterpret_cast<double*>(input.get_data());
 		std::vector<double> v(8);
@@ -34,6 +43,8 @@ struct Satellite {
 		return result;
 	}
 };
+
+// Expose VSCMG_ENV Class to Python
 
 BOOST_PYTHON_MODULE(VSCMG_ENV) {
 	boost::python::numpy::initialize();
