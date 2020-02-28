@@ -5,6 +5,14 @@
 
 Python wrapper for attitude dynamics of VSCMG in pyramid cluster.
 
+For Reinforcement Learning, It is important to have precise envirnmet responsive to actions.
+Matlab based ODE integrator are easy to implement but slower in performance. Slight improvement 
+in performace with python odeint integrators, since order of magnitude of steps to be performed
+by a learning agent are in billions. To improve computation speed C++ based dynamical envirnomet is needed
+
+This dynamical stepper implemented in C++ has shown signigicaltly large improvements in speed without compramising
+solution accuracy. To simplify access to envirnoment, python wrapper is implemented to expose VSCMG_ENV stepper.
+
 ## Python Usage
 Import exposed python class with
 ```python
@@ -34,8 +42,8 @@ print(state)
 ## Compile Requrements
 	Visual Studio C++ 2019 (MSVC 14.23)
 	Python 3.7
-	Boost 1.72.0
-	Armadillo 9.850.1
+	Boost 1.72.0 (https://www.boost.org/)
+	Armadillo 9.850.1 (http://arma.sourceforge.net/)
 
 
 ## Visual Studio C++ Project Properties
