@@ -12,16 +12,19 @@ IC=np.array([1.0, 0.0, 0.0, 0.0,	0.0, 0.0, 0.0,	1000.0, 1000.0, 1000.0, 1000.0, 
 sat.setState(IC)
 
 # control action array of (4 x RW acerlations, 4 x gimbal rates)
-action=np.array([0.0,0.0,0.0,0.0, 0.0,0.0,0.0,0.0])
+action=np.array([0.0,0.0,0.0,0.0, 0.01,0.01,0.01,0.01])
 t = 0	# time
-dt = 0	# step size
+dt = 0.01	# step size
 
 # take dynamical step of size dt with control action as input
 
-states=sat.action(action,t,dt)
+states=sat.step(action,t,dt)
 
-print(state)
-
+print(states)
+for i in range(100000):
+    states=sat.step(action,t,dt)
+    
+print(sat.step(action,t,dt))
 # Performance
 stp="""
 import numpy as np
@@ -36,5 +39,5 @@ stmt="""
 action=np.array([0.0,0.0,0.0,0.0, 0.1,0.1,0.1,0.1])
 sat.step(action,0.0,0.01)
 """
-N=10000
-print(timeit.timeit(stmt,number=N,setup=stp))
+#N=10000
+#print(timeit.timeit(stmt,number=N,setup=stp))
