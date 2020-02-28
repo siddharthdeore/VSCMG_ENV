@@ -1,6 +1,7 @@
 # VSCMG Dynamical Envirnment Wrapper
-'''
-Project Properties
+
+Visual Studio C++ Project Properties
+'''C++
 	C/C++ > Additional Include Directories
 		%PYTHON_ROOT%\include;
 		%BOOST_ROOT%;
