@@ -164,6 +164,7 @@
     <ClCompile Include="src\VSCMG_ENV.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\NumPyArrayData.h" />
     <ClInclude Include="src\VSCMG.h" />
     <ClInclude Include="src\VSCMG_ENV.h" />
   </ItemGroup>

@@ -49,6 +49,7 @@ public:
 
 	void operator()(const state_type& x, state_type& dxdt, const double t);
 	void normalizeQuaternions(double& _q0, double& _q1, double& _q2, double& _q3);
+	void setInertia(arma::mat Jb, double  Jg, double Jt);
 	//void controlAction(double u0, double u1, double u2, double u3, double u4, double u5, double u6, double u7);
 	void controlAction(std::vector<double> v);
 };

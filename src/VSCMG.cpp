@@ -82,6 +82,11 @@ void VSCMG::normalizeQuaternions(double& _q0, double& _q1, double& _q2, double& 
 	_q2 /= norm;
 	_q3 /= norm;
 }
+void VSCMG::setInertia(arma::mat Jb, double  Jg, double Jt) {
+	this->_Jb = Jb;
+	this->_Jg = Jg;
+	this->_Jt = Jt;
+}
 /*
 void VSCMG::controlAction(double u0, double u1, double u2, double u3, double u4, double u5, double u6, double u7) {
 	Omega_dot = { u0,u1,u2,u3 };
