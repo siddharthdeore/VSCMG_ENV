@@ -1,4 +1,10 @@
 # VSCMG Dynamical Envirnment Wrapper
+
+[![HitCount](http://hits.dwyl.com/siddharthdeore/VSCMG_ENV.svg)](http://hits.dwyl.com/siddharthdeore/VSCMG_ENV)
+[![MIT license](https://img.shields.io/badge/License-MIT-blue.svg)](https://lbesson.mit-license.org/)
+
+Python wrapper for attitude dynamics of VSCMG in pyramid cluster.
+
 ## Python Usage
 Import exposed python class with
 ```python
