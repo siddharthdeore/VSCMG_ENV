@@ -106,7 +106,6 @@ BOOST_PYTHON_MODULE(VSCMG_ENV) {
 		.def("resetState", &Satellite::resetState)
 		.def("setInertia", &Satellite::setInertia)
 		.def("Info", &Satellite::Info)
-		
 		;
 
 
