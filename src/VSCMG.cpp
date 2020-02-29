@@ -10,13 +10,26 @@ void VSCMG::operator()(const state_type& x, state_type& dxdt, const double t) {
 	// States
 	double q0 = x[0]; double q1 = x[1]; double q2 = x[2]; double q3 = x[3];
 	normalizeQuaternions(q0, q1, q2, q3);
+	/*
+	arma::mat omega_skew = {
+		{	0,  x[6], -x[5], x[4] },
+		{-x[6],     0,  x[4], x[5] },
+		{ x[5], -x[4],     0, x[6] },
+		{-x[4], -x[5], -x[6],   0 },
+	};
+	arma::vec qq = { x[0],x[1] ,x[2] ,x[3] };
+	arma::vec q_dot = 0.5 * omega_skew * qq;
+	dxdt[0] = q_dot(0);
+	dxdt[1] = q_dot(1);
+	dxdt[2] = q_dot(2);
+	dxdt[3] = q_dot(3);	
+	*/
 
 	// Attitude Quaternion Kinematic
-	dxdt[0] = 0.5 * (q1 * x[6] - q2 * x[5] + q3 * x[4]);
-	dxdt[1] = 0.5 * (q2 * x[4] - q0 * x[6] + q3 * x[5]);
-	dxdt[2] = 0.5 * (q0 * x[5] - q1 * x[4] + q3 * x[6]);
+	dxdt[0] = 0.5 * ( q1 * x[6] - q2 * x[5] + q3 * x[4]);
+	dxdt[1] = 0.5 * ( q2 * x[4] - q0 * x[6] + q3 * x[5]);
+	dxdt[2] = 0.5 * ( q0 * x[5] - q1 * x[4] + q3 * x[6]);
 	dxdt[3] = 0.5 * (-q0 * x[4] - q1 * x[5] - q2 * x[6]);
-
 	// Error Quaternion (Might be usefull in future )
 	/*
 	double  qe0, qe1, qe2, qe3;
@@ -28,38 +41,57 @@ void VSCMG::operator()(const state_type& x, state_type& dxdt, const double t) {
 	*/
 	arma::mat As(3, 4);
 	arma::mat At(3, 4);
-	arma::mat Ag(3, 4); // probabaly not gonna use
+	//arma::mat Ag(3, 4); // probabaly not gonna use
 	arma::vec omega = { x[4], x[5] , x[6] };
 	arma::vec Omega = { x[7], x[8], x[9], x[10] };
 	arma::mat DiagOmega = arma::diagmat(Omega);
-
+	
+	const double d1 = std::acos(std::cos(x[11]));
+	const double d2 = std::acos(std::cos(x[12]));
+	const double d3 = std::acos(std::cos(x[13]));
+	const double d4 = std::acos(std::cos(x[14]));
 	const double cb = std::cos(this->_beta);
 	const double sb = std::sin(this->_beta);
-	const double cd1 = std::cos(x[11]);
-	const double cd2 = std::cos(x[12]);
-	const double cd3 = std::cos(x[13]);
-	const double cd4 = std::cos(x[14]);
-	const double sd1 = std::sin(x[11]);
-	const double sd2 = std::sin(x[12]);
-	const double sd3 = std::sin(x[13]);
-	const double sd4 = std::sin(x[14]);
+	const double cd1 = std::cos(d1);
+	const double cd2 = std::cos(d2);
+	const double cd3 = std::cos(d3);
+	const double cd4 = std::cos(d4);
+	const double sd1 = std::sin(d1);
+	const double sd2 = std::sin(d2);
+	const double sd3 = std::sin(d3);
+	const double sd4 = std::sin(d4);
 
-	As = { {-cb * sd1, -cd2, cb * sd3, cd4}, {cd1, -cb * sd2, -cd3, cb * sd4}, {sb * sd1, sb * sd2, sb * sd3, sb * sd4} };
-	At = { {-cb * cd1, sd2, cb * cd3, -sd4 }, {-sd1, -cb * cd2, sd3, cb * cd4}, { sb * cd1, sb * cd2, sb * cd3, sb * cd4} };
+
+	As = {	{ -cb * cd1, sd2, cb * cd3, -sd4},
+			{ -sd1, -cb * cd2, sd3, cb * cd4},
+			{ sb * cd1,  sb * cd2, sb * cd3, sb * cd4}
+	};
+	At = {	{ -cb * sd1, -cd2, cb * sd3, cd4 },
+			{ cd1, -cb * sd2, -cd3, cb * sd4 },
+			{ sb * sd1,  sb * sd2, sb * sd3, sb * sd4 }
+	};
+	/*
+	As = {	{-cb * sd1, -cd2, cb * sd3, cd4},
+			{cd1, -cb * sd2, -cd3, cb * sd4},
+			{sb * sd1, sb * sd2, sb * sd3, sb * sd4}
+		};
+	At = {
+		{-cb * cd1, sd2, cb * cd3, -sd4 },
+		{-sd1, -cb * cd2, sd3, cb * cd4},
+		{ sb * cd1, sb * cd2, sb * cd3, sb * cd4} };
 	Ag = { { sb, 0, -sb, 0 }, {0, sb, 0, -sb}, {cb, cb, cb, cb} };
-
+	*/
 
 	arma::vec H_dot = { 0,0,0 };
 	arma::vec omega_dot = { 0,0,0 };
-
-	H_dot = -arma::cross(this->_Jw * omega, omega)
-		- arma::cross(Ag * Delta_dot, omega)
-		- arma::cross(this->_Jw * As * Omega, omega)
-		- this->_Jw * As * Omega_dot
-		- this->_Jw * At * DiagOmega * Delta_dot;
-
+	H_dot = - arma::cross(omega, this->_Jw * omega)
+			- arma::cross(this->_Jw * (As * Omega), omega)
+			- this->_Jw * (As * Omega_dot)
+			- this->_Jw * ((At * DiagOmega) * Delta_dot);
+		
+	     // - arma::cross(Ag * Delta_dot, omega) // if im going to consider Ag Matrix
+	
 	omega_dot = arma::inv(this->_Jb) * H_dot;
-
 	dxdt[4] = omega_dot(0);
 	dxdt[5] = omega_dot(1);
 	dxdt[6] = omega_dot(2);

@@ -52,5 +52,5 @@ stmt="""
 action=np.array([0.0,0.0,0.0,0.0, 0.1,0.1,0.1,0.1])
 sat.step(action,0.0,0.01)
 """
-N=100000
+N=10000
 print(timeit.timeit(stmt,number=N,setup=stp))

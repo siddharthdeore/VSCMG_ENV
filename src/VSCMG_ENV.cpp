@@ -9,12 +9,13 @@
 namespace bn = boost::python::numpy;
 
 struct Satellite {
-	state_type X= { 0.0,0.0,0.0,1.0,   0.0,0.0,0.0, 100.0,100.0,100.0,100.0, 0.0,0.0,0.0,0.0, };
+	state_type X= { 0.0,0.0,0.0,1.0, 0.0,0.0,0.0, 100.0,100.0,100.0,100.0, 0.0,0.0,0.0,0.0, };
 	// initialise object
 	VSCMG satellite;
 	// initialise stepper
-	boost::numeric::odeint::runge_kutta_cash_karp54< state_type > stepper;
-
+	//boost::numeric::odeint::runge_kutta_cash_karp54< state_type > stepper;
+	boost::numeric::odeint::runge_kutta_dopri5<state_type> stepper;
+	//boost::numeric::odeint::runge_kutta_fehlberg78<state_type> stepper;
 	//(Exposed to python) set state of satellite from numpy array 
 	void setState(boost::python::numpy::ndarray& input) {
 		double* input_ptr = reinterpret_cast<double*>(input.get_data());
@@ -27,10 +28,16 @@ struct Satellite {
 	void setInertia(boost::python::numpy::ndarray& input, double Jg, double Jw) {
 		NumPyArrayData<double> data(input);
 		arma::mat Jb = {
+			{ 0.0220, 0.0000,  0.0000 },
+			{ 0.0000, 0.0220,  0.0000 },
+			{ 0.0000, 0.0000,  0.0029 },
+		};
+		/*
 			{ 0.0220, 0.0012, -0.0070 },
 			{ 0.0012, 0.0220,  0.0012 },
 			{-0.0070, 0.0012,  0.0029 },
-		};
+
+		*/
 
 		for (short i = 0; i < 3; i++) {
 			for (short j = 0; j < 3; j++) {
@@ -41,24 +48,33 @@ struct Satellite {
 	}
 	//(Exposed to python) set state of satellite from numpy array 
 	void resetState() {
-		this->X = { 1.,0.,0.,0., 0.,0.,0., 0.,0.,0.,0., 0.,0.,0.,0., };
+		this->X = { 0.0,0.0,0.0,1.0, 0.0,0.0,0.0, 0.0,0.0,0.0,0.0, 0.0,0.0,0.0,0.0 };
 	}
 	// (Exposed to python) Take a dybamical step step and return Numpy Array
 	// x = f(x,u,t)
 	bn::ndarray step(boost::python::numpy::ndarray& input, double t, double dt) {
-		double* input_ptr = reinterpret_cast<double*>(input.get_data());
+		NumPyArrayData<double> d(input);
 		std::vector<double> v(8);
 		for (int i = 0; i < 8; ++i) {
-			v[i] = *(input_ptr + i);
+			v[i] = d(i);
 		}
 		//satellite.controlAction(v[0], v[1], v[2], v[3], v[4], v[5], v[6], v[7]);
 		satellite.controlAction(v);
 		stepper.do_step(satellite, this->X, t, dt);
 
-		// result data for python 
 		Py_intptr_t shape[1] = { this->X.size() };
 		bn::ndarray result = bn::zeros(1, shape, bn::dtype::get_builtin<double>());
 		std::copy(this->X.begin(), this->X.end(), reinterpret_cast<double*>(result.get_data()));
+
+		double q0 = this->X[0];
+		double q1 = this->X[1];
+		double q2 = this->X[2];
+		double q3 = this->X[3];
+		satellite.normalizeQuaternions(q0, q1, q2, q3);
+		result[0] = q0;
+		result[1] = q1;
+		result[2] = q2;
+		result[3] = q3;
 		return result;
 	}
 	bn::ndarray stepNull(double t, double dt) {
