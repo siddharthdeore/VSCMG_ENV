@@ -7,15 +7,20 @@
 #include "VSCMG.h"
 #include "NumPyArrayData.h"
 namespace bn = boost::python::numpy;
+namespace bo = boost::numeric::odeint;
 
+typedef bo::runge_kutta_cash_karp54< state_type > error_stepper_type;
+typedef bo::controlled_runge_kutta< error_stepper_type > controlled_stepper_type;
 struct Satellite {
 	state_type X= { 0.0,0.0,0.0,1.0, 0.0,0.0,0.0, 100.0,100.0,100.0,100.0, 0.0,0.0,0.0,0.0, };
 	// initialise object
 	VSCMG satellite;
 	// initialise stepper
 	//boost::numeric::odeint::runge_kutta_cash_karp54< state_type > stepper;
-	boost::numeric::odeint::runge_kutta_dopri5<state_type> stepper;
-	//boost::numeric::odeint::runge_kutta_fehlberg78<state_type> stepper;
+	//boost::numeric::odeint::runge_kutta_dopri5<state_type> stepper;
+	//bo::runge_kutta_fehlberg78<state_type> stepper;
+	//bo::controlled_runge_kutta<state_type> bo::make_controlled(bo::runge_kutta_dopri5< state_type > stepper);
+	controlled_stepper_type stepper;
 	//(Exposed to python) set state of satellite from numpy array 
 	void setState(boost::python::numpy::ndarray& input) {
 		double* input_ptr = reinterpret_cast<double*>(input.get_data());
@@ -60,7 +65,10 @@ struct Satellite {
 		}
 		//satellite.controlAction(v[0], v[1], v[2], v[3], v[4], v[5], v[6], v[7]);
 		satellite.controlAction(v);
-		stepper.do_step(satellite, this->X, t, dt);
+		bo::integrate_adaptive(bo::make_controlled< error_stepper_type >(1.0e-10, 1.0e-6),
+							   satellite, this->X, t, dt, dt / 5);
+
+		//stepper.do_step(satellite, this->X, t, dt);
 
 		Py_intptr_t shape[1] = { this->X.size() };
 		bn::ndarray result = bn::zeros(1, shape, bn::dtype::get_builtin<double>());
@@ -81,7 +89,9 @@ struct Satellite {
 		std::vector<double> v{0,0,0,0,0,0,0,0};
 		//satellite.controlAction(v[0], v[1], v[2], v[3], v[4], v[5], v[6], v[7]);
 		satellite.controlAction(v);
-		stepper.do_step(satellite, this->X, t, dt);
+		//stepper.do_step(satellite, this->X, t, dt);
+		bo::integrate_adaptive(bo::make_controlled< error_stepper_type >(1.0e-10, 1.0e-6),
+							   satellite, this->X, t, dt, dt/5);
 
 		// result data for python 
 		Py_intptr_t shape[1] = { this->X.size() };
