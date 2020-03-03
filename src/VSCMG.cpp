@@ -5,7 +5,9 @@
 #define _CRT_SECURE_NO_WARNINGS
 
 #include "VSCMG.h"
-
+/**
+ * VSCMG state space dynamics
+ */
 void VSCMG::operator()(const state_type& x, state_type& dxdt, const double t) {
 	// States
 	double q0 = x[0]; double q1 = x[1]; double q2 = x[2]; double q3 = x[3];
@@ -50,8 +52,8 @@ void VSCMG::operator()(const state_type& x, state_type& dxdt, const double t) {
 	const double d2 = std::acos(std::cos(x[12]));
 	const double d3 = std::acos(std::cos(x[13]));
 	const double d4 = std::acos(std::cos(x[14]));
-	const double cb = std::cos(this->_beta);
-	const double sb = std::sin(this->_beta);
+	const double cb = 0.5773502691896261;//std::cos(this->_beta);
+	const double sb = 0.8164965809277258;//std::sin(this->_beta);
 	const double cd1 = std::cos(d1);
 	const double cd2 = std::cos(d2);
 	const double cd3 = std::cos(d3);
@@ -119,6 +121,12 @@ void VSCMG::setInertia(arma::mat Jb, double  Jg, double Jw) {
 	this->_Jg = Jg;
 	this->_Jw = Jw;
 }
+void VSCMG::setTargetQuaternion(double q0, double q1, double q2, double q3) {
+	this->qd[0] = q0;
+	this->qd[1] = q1;
+	this->qd[2] = q2;
+	this->qd[3] = q3;
+}
 /*
 void VSCMG::controlAction(double u0, double u1, double u2, double u3, double u4, double u5, double u6, double u7) {
 	Omega_dot = { u0,u1,u2,u3 };
@@ -140,7 +148,8 @@ void VSCMG::Info()
 		}
 		printf("\n");
 	}
-	printf("\n Reaction Inertia : %8.4f \t Gimbal Inertia %8.4f \n", this->_Jw, this->_Jg);
+	printf("Reaction Inertia : %8.4f \t Gimbal Inertia %8.4f \n", this->_Jw, this->_Jg);
+	printf("\n Target Quaternions (%8.4f, %8.4f, %8.4f, %8.4f)", qd[0], qd[1], qd[2], qd[3]);
 
 }
 

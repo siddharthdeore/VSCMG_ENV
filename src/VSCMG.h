@@ -26,7 +26,6 @@ private:
 		{-0.0070, 0.0012,  0.0029 },
 	};
 
-	double _beta = 0.955316618124509; // Skew Angle beta = atan(sqrt(2));
 
 	double _Jw = 9.7e-3; // Reaction Wheel Inertia
 	double _Jg = 1.1e-2; // Gimbal Inertia
@@ -43,13 +42,15 @@ private:
 	// Reaction Wheel Rates
 	double _Omega[4] = { 0.0, 0.0, 0.0, 0.0 };
 public:
-	double qd[4] = { 1.0, 0.0, 0.0, 0.0 };
+	double _beta = 0.955316618124509; // Skew Angle beta = atan(sqrt(2));
+	double qd[4] = { 1.0,0.0,0.0,0.0 };
 	arma::vec Delta_dot = { 0.0,0.0,0.0,0.0 }; // controll input delta_dot
 	arma::vec Omega_dot = { 0.0,0.0,0.0,0.0 }; // controll input omega_dot
 
 	void operator()(const state_type& x, state_type& dxdt, const double t);
 	void normalizeQuaternions(double& _q0, double& _q1, double& _q2, double& _q3);
 	void setInertia(arma::mat Jb, double  Jg, double Jw);
+	void setTargetQuaternion(double q0, double q1, double q2, double q3);
 	//void controlAction(double u0, double u1, double u2, double u3, double u4, double u5, double u6, double u7);
 	void controlAction(std::vector<double> v);
 	void Info();
