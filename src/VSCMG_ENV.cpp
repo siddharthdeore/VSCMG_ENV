@@ -14,6 +14,8 @@ typedef bo::runge_kutta_cash_karp54< state_type > error_stepper_type;
 typedef bo::controlled_runge_kutta< error_stepper_type > controlled_stepper_type;
 struct Satellite {
 	state_type X= { 0.0,0.0,0.0,1.0, 0.0,0.0,0.0, 100.0,100.0,100.0,100.0, 0.0,0.0,0.0,0.0, };
+	double Kp = 0.11;
+	double Kd = 0.22;
 	// initialise object
 	VSCMG satellite;
 	// initialise stepper
@@ -91,9 +93,9 @@ struct Satellite {
 		//arma::mat Ag(3, 4); // probabaly not gonna use
 
 		arma::vec u = { 0,0,0 };
-		u[0] = 0.01 * qe0 * qe3 + 0.01 * omega[0];
-		u[1] = 0.01 * qe1 * qe3 + 0.01 * omega[1];
-		u[2] = 0.01 * qe2 * qe3 + 0.01 * omega[2];
+		u[0] = Kp * qe0 * qe3 + Kd * omega[0];
+		u[1] = Kp * qe1 * qe3 + Kd * omega[1];
+		u[2] = Kp * qe2 * qe3 + Kd * omega[2];
 
 		arma::vec Omega = { X[7], X[8], X[9], X[10] };
 		arma::mat DiagOmega = arma::diagmat(Omega);
@@ -123,14 +125,14 @@ struct Satellite {
 				{ sb * sd1,  sb * sd2, sb * sd3, sb * sd4 }
 		};
 
-		Q = arma::join_cols(As, At);
-		//double m_rw = arma::det(Q * Q.t());
-		//double alfa = 10000 * exp(-0.0001 * m_rw);
+		Q = arma::join_rows(As, At);
+		double m_rw = arma::det(Q * Q.t());
+		double alfa = 10000 * exp(-0.0001 * m_rw);
 		arma::mat W=arma::eye(8,8);
-		//W(0, 0) = alfa; W(1, 1) = alfa; W(2, 2) = alfa; W(3, 3) = alfa;
+		W[0, 0] = alfa; W[1, 1] = alfa; W[2, 2] = alfa; W[3, 3] = alfa;
 		arma::vec omega_delta(8);
-		//omega_delta = W * Q.t() * arma::inv(Q * W * Q.t()) * u;
-
+		omega_delta = (W * (Q.t() * arma::inv(Q * (W * Q.t())))) * u;
+		
 		Py_intptr_t shape[1] = { omega_delta.size() };
 		bn::ndarray result = bn::zeros(1, shape, bn::dtype::get_builtin<double>());
 		for (short i = 0; i < 8; i++) {
@@ -189,6 +191,10 @@ struct Satellite {
 	void setTargetQuaternion(double q0, double q1, double q2, double q3) {
 		satellite.setTargetQuaternion(q0, q1, q2, q3);
 	}
+	void setGains(double q0, double q1) {
+		Kp = q0;
+		Kd = q1;
+	}
 	void Info() {
 		satellite.Info();
 	}
@@ -207,7 +213,8 @@ BOOST_PYTHON_MODULE(VSCMG_ENV) {
 		.def("setState", &Satellite::setState)
 		.def("setInertia", &Satellite::setInertia)
 		.def("setTargetQuaternion", &Satellite::setTargetQuaternion)
-		.def("getAction", &Satellite::getAction)		
+		.def("getAction", &Satellite::getAction)
+		.def("setGains", &Satellite::setGains)
 		;
 
 
