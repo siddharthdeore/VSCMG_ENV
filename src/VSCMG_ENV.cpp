@@ -126,7 +126,8 @@ struct Satellite {
 		};
 		At = At * DiagOmega;
 		Q = arma::join_rows(As, At);
-		arma::mat QQt = Q * Q.t();
+		arma::mat QQt(3, 3);
+		QQt = Q * Q.t();
 		double m_vsc = arma::det(QQt);
 
 		arma::vec omega_delta(8);
@@ -143,10 +144,10 @@ struct Satellite {
 				{e2,e1,1}
 		};
 		E = E * lambda;
-		omega_delta = (Q.t() * arma::inv(QQt + E) ) * u;
+		omega_delta = (Q.t() * arma::inv((QQt + E)) ) * u;
 
 		for (short i = 0; i < 8; i++) {
-			result[i] = omega_delta[i];
+			result[i] = omega_delta[i]/0.0097;
 		}
 		
 
