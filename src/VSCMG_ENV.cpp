@@ -115,24 +115,25 @@ struct Satellite {
 		const double sd3 = std::sin(d3);
 		const double sd4 = std::sin(d4);
 
+		At = { {  -cb * sd1, -cd2, cb * sd3,  cd4 },
+	{            cd1, -cb * sd2,   -cd3, cb * sd4 },
+	{     sb * sd1,  sb * sd2, sb * sd3, sb * sd4 }
+		};
 
-		At = { { -cb * cd1, sd2, cb * cd3, -sd4},
-				{ -sd1, -cb * cd2, sd3, cb * cd4},
-				{ sb * cd1,  sb * cd2, sb * cd3, sb * cd4}
+		As = { { -cb * cd1,  sd2, cb * cd3, -sd4},
+			{   -sd1,  -cb * cd2,  sd3, cb * cd4},
+			{  sb * cd1, sb * cd2, sb * cd3, sb * cd4}
 		};
-		As = { { -cb * sd1, -cd2, cb * sd3, cd4 },
-				{ cd1, -cb * sd2, -cd3, cb * sd4 },
-				{ sb * sd1,  sb * sd2, sb * sd3, sb * sd4 }
-		};
-		At = At * DiagOmega;
-		Q = arma::join_rows(As, At);
+
+		arma::vec omega_delta(8);
+		Py_intptr_t shape[1] = { omega_delta.size() };
+
+		Q = arma::join_rows(As, (At * DiagOmega));
+
 		arma::mat QQt(3, 3);
 		QQt = Q * Q.t();
 		double m_vsc = arma::det(QQt);
 
-		arma::vec omega_delta(8);
-		Py_intptr_t shape[1] = { omega_delta.size() };
-		bn::ndarray result = bn::zeros(1, shape, bn::dtype::get_builtin<double>());
 
 		double lambda = 0.01 * exp(-10.0 * m_vsc );
 		double e1 = 0.01 * std::sin(t*3.1415 / 2);
@@ -146,8 +147,12 @@ struct Satellite {
 		E = E * lambda;
 		omega_delta = (Q.t() * arma::inv((QQt + E)) ) * u;
 
+
+		//omega_delta =  arma::pinv(Q) * u;
+
+		bn::ndarray result = bn::zeros(1, shape, bn::dtype::get_builtin<double>());
 		for (short i = 0; i < 8; i++) {
-			result[i] = omega_delta[i]/0.0097;
+			result[i] = omega_delta[i];
 		}
 		
 
