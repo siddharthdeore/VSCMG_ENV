@@ -21,11 +21,10 @@ struct VSCMG {
 private:
 	// Body Innertia
 	arma::mat _Jb = {
-		{ 0.0220, 0.0012, -0.0070 },
-		{ 0.0012, 0.0220,  0.0012 },
-		{-0.0070, 0.0012,  0.0029 },
+		{ 0.0220, 0.0000,  0.0000 },
+		{ 0.0000, 0.0220,  0.0000 },
+		{ 0.0000, 0.0000,  0.0220 },
 	};
-
 
 	double _Jw = 9.7e-3; // Reaction Wheel Inertia
 	double _Jg = 1.1e-2; // Gimbal Inertia

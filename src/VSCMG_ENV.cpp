@@ -13,7 +13,7 @@ namespace bo = boost::numeric::odeint;
 typedef bo::runge_kutta_cash_karp54< state_type > error_stepper_type;
 typedef bo::controlled_runge_kutta< error_stepper_type > controlled_stepper_type;
 struct Satellite {
-	state_type X= { 0.0,0.0,0.0,1.0, 0.0,0.0,0.0, 100.0,100.0,100.0,100.0, 0.0,0.0,0.0,0.0, };
+	state_type X = { 0.0,0.0,0.0,1.0, 0.0,0.0,0.0, 100.0,100.0,100.0,100.0, 0.0,0.0,0.0,0.0, };
 	double Kp = 0.11;
 	double Kd = 0.22;
 	// initialise object
@@ -38,7 +38,7 @@ struct Satellite {
 		arma::mat Jb = {
 			{ 0.0220, 0.0000,  0.0000 },
 			{ 0.0000, 0.0220,  0.0000 },
-			{ 0.0000, 0.0000,  0.0029 },
+			{ 0.0000, 0.0000,  0.0220 },
 		};
 		/*
 			{ 0.0220, 0.0012, -0.0070 },
@@ -58,7 +58,7 @@ struct Satellite {
 	void resetState() {
 		this->X = { 0.0,0.0,0.0,1.0, 0.0,0.0,0.0, 0.0,0.0,0.0,0.0, 0.0,0.0,0.0,0.0 };
 	}
-	bn::ndarray getAction() {
+	bn::ndarray getAction(float t) {
 		// States
 		double q0 = X[0]; double q1 = X[1]; double q2 = X[2]; double q3 = X[3];
 		arma::vec omega = { X[4], X[5] , X[6] };
@@ -99,7 +99,7 @@ struct Satellite {
 
 		arma::vec Omega = { X[7], X[8], X[9], X[10] };
 		arma::mat DiagOmega = arma::diagmat(Omega);
-		
+
 		const double d1 = std::acos(std::cos(X[11]));
 		const double d2 = std::acos(std::cos(X[12]));
 		const double d3 = std::acos(std::cos(X[13]));
@@ -116,28 +116,41 @@ struct Satellite {
 		const double sd4 = std::sin(d4);
 
 
-		As = { { -cb * cd1, sd2, cb * cd3, -sd4},
+		At = { { -cb * cd1, sd2, cb * cd3, -sd4},
 				{ -sd1, -cb * cd2, sd3, cb * cd4},
 				{ sb * cd1,  sb * cd2, sb * cd3, sb * cd4}
 		};
-		At = { { -cb * sd1, -cd2, cb * sd3, cd4 },
+		As = { { -cb * sd1, -cd2, cb * sd3, cd4 },
 				{ cd1, -cb * sd2, -cd3, cb * sd4 },
 				{ sb * sd1,  sb * sd2, sb * sd3, sb * sd4 }
 		};
-
+		At = At * DiagOmega;
 		Q = arma::join_rows(As, At);
-		double m_rw = arma::det(Q * Q.t());
-		double alfa = 10000 * exp(-0.0001 * m_rw);
-		arma::mat W=arma::eye(8,8);
-		W[0, 0] = alfa; W[1, 1] = alfa; W[2, 2] = alfa; W[3, 3] = alfa;
+		arma::mat QQt = Q * Q.t();
+		double m_vsc = arma::det(QQt);
+
 		arma::vec omega_delta(8);
-		omega_delta = (W * (Q.t() * arma::inv(Q * (W * Q.t())))) * u;
-		
 		Py_intptr_t shape[1] = { omega_delta.size() };
 		bn::ndarray result = bn::zeros(1, shape, bn::dtype::get_builtin<double>());
+
+		double lambda = 0.01 * exp(-10.0 * m_vsc );
+		double e1 = 0.01 * std::sin(t*3.1415 / 2);
+		double e2 = 0.01 * std::sin(t*3.1415 / 2 + 3.1415/2);
+		double e3 = 0.01 * std::sin(t*3.1415 / 2 + 3.1415);
+		arma::mat E(3, 3);
+		E = {	{1,e1,e2},
+				{e3,1,e1},
+				{e2,e1,1}
+		};
+		E = E * lambda;
+		omega_delta = (Q.t() * arma::inv(QQt + E) ) * u;
+
 		for (short i = 0; i < 8; i++) {
 			result[i] = omega_delta[i];
 		}
+		
+
+
 		return result;
 	}
 	/** (Exposed to python) Intigrate, Take a dybamical step and return Numpy Array
@@ -175,7 +188,7 @@ struct Satellite {
 		return result;
 	}
 	bn::ndarray stepNull(double t, double dt) {
-		std::vector<double> v{0,0,0,0,0,0,0,0};
+		std::vector<double> v{ 0,0,0,0,0,0,0,0 };
 		//satellite.controlAction(v[0], v[1], v[2], v[3], v[4], v[5], v[6], v[7]);
 		satellite.controlAction(v);
 		//stepper.do_step(satellite, this->X, t, dt);
