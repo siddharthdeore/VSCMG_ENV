@@ -9,6 +9,7 @@ For Reinforcement Learning, It is important to have precise environment, respons
 This dynamical stepper implemented in C++ has shown significantly large improvements in speed without compromising solution accuracy. To simplify access to envirnoment, python wrapper is implemented to expose VSCMG_ENV stepper.
 ## Binaries
 Stable Release (https://github.com/siddharthdeore/VSCMG_ENV/releases/tag/VSCMG_ENV)
+Copy VSCMG_ENV.pyd inside *your_python_root/DLLs* directory
 
 ## Python Usage
 Acessing exposed python class!
