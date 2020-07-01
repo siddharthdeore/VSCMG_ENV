@@ -11,7 +11,7 @@ This dynamical stepper implemented in C++ has shown significantly large improvem
 Stable Release (https://github.com/siddharthdeore/VSCMG_ENV/releases/tag/VSCMG_ENV)
 
 ## Python Usage
-Import exposed python class with
+Acessing exposed python class!
 ```python
 import numpy as np
 import VSCMG_ENV
@@ -64,7 +64,7 @@ print(states)
 
 
 ## Visual Studio C++ Project Properties
-```c
+```batch
 C/C++ >> Additional Include Directories
 	%PYTHON_ROOT%\include;
 	%BOOST_ROOT%;
