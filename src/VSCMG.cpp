@@ -2,7 +2,6 @@
 	@author :	Siddharth Deore
 	@email	:	deore.1823670@studenti.uniroma1.it
 */
-#define _CRT_SECURE_NO_WARNINGS
 
 #include "VSCMG.h"
 /**
@@ -87,12 +86,14 @@ void VSCMG::operator()(const state_type& x, state_type& dxdt, const double t) {
 	arma::vec H_dot = { 0,0,0 };
 	arma::vec omega_dot = { 0,0,0 };
 	H_dot = - arma::cross(omega, this->_Jw * omega)
-			- arma::cross(this->_Jw * (As * Omega), omega)
-			- this->_Jw * (As * Omega_dot)
-			- this->_Jw * ((At * DiagOmega) * Delta_dot);
-		
+			- arma::cross(omega, this->_Jw * (As * Omega))
+			- (As * this->_Jw * Omega_dot)
+			- (At * this->_Jw * DiagOmega * Delta_dot);
+
 	     // - arma::cross(Ag * Delta_dot, omega) // if im going to consider Ag Matrix
-	
+
+		 // H_dot = - At*Jw*diag(Omega)*Delta_dot - cross(J*omega + As*Jw*Omega + Ag*Jg*Delta_dot,omega) - As*Jw*Omega_dot-Ag*Jg*Delta_dot;
+
 	omega_dot = arma::inv(this->_Jb) * H_dot;
 	dxdt[4] = omega_dot(0);
 	dxdt[5] = omega_dot(1);
@@ -149,7 +150,7 @@ void VSCMG::Info()
 		printf("\n");
 	}
 	printf("Reaction Inertia : %8.4f \t Gimbal Inertia %8.4f \n", this->_Jw, this->_Jg);
-	printf("\n Target Quaternions (%8.4f, %8.4f, %8.4f, %8.4f)", qd[0], qd[1], qd[2], qd[3]);
+	printf("\n Target Quaternions (%8.4f, %8.4f, %8.4f, %8.4f) \n", qd[0], qd[1], qd[2], qd[3]);
 
 }
 
