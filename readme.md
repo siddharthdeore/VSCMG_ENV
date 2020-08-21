@@ -12,7 +12,7 @@ Stable Release (https://github.com/siddharthdeore/VSCMG_ENV/releases/tag/VSCMG_E
 Copy VSCMG_ENV.pyd inside *your_python_root/DLLs* directory
 
 ## Python Usage
-Acessing exposed python class!
+Acess library from python.
 ```python
 import numpy as np
 import VSCMG_ENV
