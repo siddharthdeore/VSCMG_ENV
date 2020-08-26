@@ -4,6 +4,8 @@
 */
 
 #pragma once
+#define BOOST_PYTHON_STATIC_LIB
+#define BOOST_NUMPY_STATIC_LIB
 
 #include <boost/python.hpp>
 #include <boost/python/numpy.hpp>
@@ -12,7 +14,6 @@
 #include <boost/array.hpp>
 #include <boost/numeric/odeint.hpp>
 #include <armadillo>
-
 typedef boost::array< double, 15 > state_type;
 typedef std::vector<double> vec;
 
